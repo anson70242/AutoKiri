@@ -7,7 +7,7 @@ streamers:
         channel_id: "UCdvq5i3RyRsoTqITD1xSxNw"
 
       - platform: "twitch"
-        channel_name: "hiiragiyukaofficial"
+        channel_name: "柊優花 (hiiragiyukaofficial)"
         
   - name: "Haru"
     accounts:

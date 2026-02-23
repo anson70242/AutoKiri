@@ -81,6 +81,17 @@ class YoutubeChatParser:
                 f.write(custom_json_output)
 
             print(f"[Success] YouTube 弹幕清洗完成，共提取 {len(parsed_chat)} 条")
+
+            # ==========================================
+            # 新增：清洗成功后，直接在模块内部删除原始档案
+            # ==========================================
+            try:
+                input_path.unlink()
+                print(f"[Info] 已自动删除原始未处理的弹幕文件: {input_path.name}")
+            except Exception as e:
+                print(f"[Warning] 删除原始弹幕文件失败: {e}")
+            # ==========================================
+
             return True
 
         except Exception as e:

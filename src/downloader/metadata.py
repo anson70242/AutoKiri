@@ -34,7 +34,11 @@ class BaseMetadataExtractor:
                     target_id = account.get("channel_id", "").lower()
                     target_name = account.get("channel_name", "").lower()
                     
-                    if target_id == uploader or target_name == uploader or target_name in uploader:
+                    # 严谨的判断逻辑：只有在 config 确实有填写该栏位(不为空)时，才进行比对
+                    match_id = (target_id != "") and (target_id == uploader)
+                    match_name = (target_name != "") and (target_name == uploader or target_name in uploader)
+                    
+                    if match_id or match_name:
                         creator_name = streamer["name"]
                         break
             if creator_name != "Unknown":
@@ -65,10 +69,20 @@ class YtdlpExtractor(BaseMetadataExtractor):
             return {"status": "error"}
         
         print(f"[yt-dlp] 解析影片: {url}")
-        command = [str(self.exe_path), "-j", "--no-warnings", url]
+        # 基础命令
+        command = [str(self.exe_path), "-j", "--no-warnings", "--ignore-no-formats-error"]
+        
+        # ========== 新增：检查并挂载 Cookie ==========
+        cookie_file = self.project_root / "secret" / "youtube_cookies.txt"
+        if cookie_file.exists():
+            print("[Info] 检测到 youtube_cookies.txt，尝试以授权身份获取 Metadata...")
+            command.extend(["--cookies", str(cookie_file)])
+        # ==========================================
+        
+        command.append(url)
         
         try:
-            result = subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8")
+            result = subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8", errors="ignore")
             raw_data = json.loads(result.stdout)
             
             # 判斷平台
@@ -126,24 +140,33 @@ class TwitchExtractor(BaseMetadataExtractor):
         
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8")
+            # print(f"[Debug] Twitch CLI 原生输出:\n{result.stdout}")
             
             title = "No Title"
             uploader = ""
             date_str = "19700101"
             
-            # 逐行解析文字輸出 (TwitchDownloaderCLI info 預設為 Table 格式)
+            # 逐行解析文字輸出 (支援最新的 ASCII Table 格式)
             for line in result.stdout.split("\n"):
-                line = line.strip()
-                if "Title:" in line:
-                    title = line.split("Title:", 1)[1].strip()
-                elif "Streamer:" in line:
-                    uploader = line.split("Streamer:", 1)[1].strip()
-                # 官方輸出的時間通常會包含 Created 或 Published 關鍵字
-                elif "Created" in line or "Published" in line or "At:" in line:
-                    date_match = re.search(r"(\d{4})[-/]?(\d{1,2})[-/]?(\d{1,2})", line)
-                    if date_match:
-                        y, m, d = date_match.groups()
-                        date_str = f"{y}{int(m):02d}{int(d):02d}"
+                # 如果這行包含表格的分隔符號 '│'
+                if "│" in line:
+                    # 用 '│' 切割並去除空白
+                    parts = [p.strip() for p in line.split("│")]
+                    
+                    # parts 會長得像 ['', 'Streamer', '柊優花 (hiiragiyukaofficial)', '']
+                    if len(parts) >= 3:
+                        key = parts[1]
+                        val = parts[2]
+                        
+                        if key == "Streamer":
+                            uploader = val  # 這裡會抓到 "柊優花 (hiiragiyukaofficial)"
+                        elif key == "Title":
+                            title = val     # 這裡會抓到 "LET's Play!"
+                        elif key == "Created at":
+                            date_match = re.search(r"(\d{4})[-/]?(\d{1,2})[-/]?(\d{1,2})", val)
+                            if date_match:
+                                y, m, d = date_match.groups()
+                                date_str = f"{y}{int(m):02d}{int(d):02d}"
 
             return self._match_and_format("twitch", uploader, title, date_str, url)
 
