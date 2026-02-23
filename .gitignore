@@ -4,6 +4,6 @@ logs/
 *.log
 __pycache__/
 .cache/
-src/highlight_cliper/models/
+src/models/
 test_output/
 secret/*.txt
