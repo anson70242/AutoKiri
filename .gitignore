@@ -5,3 +5,5 @@ logs/
 __pycache__/
 .cache/
 models/
+test_output/
+secret/*.txt
