@@ -1,0 +1,7 @@
+.env
+videos/
+logs/
+*.log
+__pycache__/
+.cache/
+models/

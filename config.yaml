@@ -1,0 +1,18 @@
+# config.yaml
+streamers:
+  # Youtube_channel_id: (yt-dlp --print channel_id [video link])
+  - name: "Yuka"
+    accounts:
+      - platform: "youtube"
+        channel_id: "UCdvq5i3RyRsoTqITD1xSxNw"
+
+      - platform: "twitch"
+        channel_name: "hiiragiyukaofficial"
+        
+  - name: "Haru"
+    accounts:
+      - platform: "youtube"
+        channel_id: "UCrOV-crqUmRluPVOjjVs-Xw"
+
+      - platform: "twitcast"
+        channel_name: "shino_nome22"
