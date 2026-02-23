@@ -21,10 +21,14 @@ def parse_twitch_chat(input_path: Path, output_path: Path) -> bool:
             json_data = json.load(f)
             
         for c in json_data.get('comments', []):
-            offset = c.get('contentOffsetSeconds', 0)
+            # 修正：使用 content_offset_seconds
+            offset = c.get('content_offset_seconds', 0)
             time_str = format_seconds(offset)
             
-            user = c.get('commenter', {}).get('displayName', 'Unknown')
+            # 修正：使用 display_name
+            commenter = c.get('commenter') or {}
+            user = commenter.get('display_name', 'Unknown')
+            
             msg = c.get('message', {}).get('body', '')
             
             if msg.strip():
@@ -34,7 +38,6 @@ def parse_twitch_chat(input_path: Path, output_path: Path) -> bool:
             print("[Warning] Twitch: 未提取到任何有效的弹幕数据。")
             return False
 
-        # 定制化输出：强制让 time, user, msg 在同一行
         lines = [f'  {json.dumps(c, ensure_ascii=False)}' for c in parsed_chat]
         custom_json_output = "[\n" + ",\n".join(lines) + "\n]"
 
@@ -47,3 +50,41 @@ def parse_twitch_chat(input_path: Path, output_path: Path) -> bool:
     except Exception as e:
         print(f"[Error] Twitch 清洗弹幕发生致命错误: {e}")
         return False
+
+# === 快速测试区块 ===
+if __name__ == "__main__":
+    import os
+    from pathlib import Path
+
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parent.parent.parent
+    test_output_dir = project_root / "test_output"
+
+    if not test_output_dir.exists():
+        print(f"[Error] 找不到测试输出目录: {test_output_dir}")
+        exit(1)
+
+    chat_files = list(test_output_dir.glob("yuka.json"))
+    
+    if not chat_files:
+        print(f"[Error] 在 {test_output_dir} 中找不到任何弹幕文件。")
+        exit(1)
+
+    input_file = sorted(chat_files, key=os.path.getmtime, reverse=True)[0]
+    output_file = test_output_dir / f"parsed_twitch_{input_file.name}"
+
+    print("-" * 50)
+    print(f"[Test] 开始测试 Twitch Chat Parser")
+    print(f"> 输入文件: {input_file.name}")
+    print(f"> 输出文件: {output_file.name}")
+    print("-" * 50)
+
+    success = parse_twitch_chat(input_file, output_file)
+
+    if success and output_file.exists():
+        print(f"\n>>> 解析成功！预览前 5 行:")
+        with open(output_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            print("".join(lines[:5]).strip())
+            if len(lines) > 5:
+                print("  ...")
