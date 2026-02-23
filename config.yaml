@@ -16,3 +16,9 @@ streamers:
 
       - platform: "twitcast"
         channel_name: "shino_nome22"
+
+tools_paths:
+  yt_dlp: "yt-dlp/yt-dlp.exe"
+  twitch_downloader_cli: "TwitchDownloaderCLI/TwitchDownloaderCLI.exe"
+  ffmpeg: "ffmpeg-8.0.1-essentials_build/bin/ffmpeg.exe"
+  ffprobe: "ffmpeg-8.0.1-essentials_build/bin/ffprobe.exe"
