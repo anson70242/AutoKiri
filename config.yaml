@@ -17,10 +17,6 @@ streamers:
       - platform: "twitcast"
         channel_name: "shino_nome22"
 
-download_settings:
-  # edge, chrome, firefox, safari
-  cookie_browser: "edge"
-
 tools_paths:
   yt_dlp: "yt-dlp/yt-dlp.exe"
   twitch_downloader_cli: "TwitchDownloaderCLI/TwitchDownloaderCLI.exe"

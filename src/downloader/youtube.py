@@ -142,7 +142,7 @@ if __name__ == "__main__":
     mock_tools_paths = {
         "yt_dlp": "yt-dlp/yt-dlp.exe",
         "ffmpeg": "ffmpeg-8.0.1-essentials_build/bin/ffmpeg.exe",
-        "node": "node-v20-win-x64/node.exe" 
+        "node": "node-v24.13.1-win-x64/node.exe" 
     }
     
     # 模拟 MetadataManager 解析出来的资料
