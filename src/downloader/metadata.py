@@ -228,6 +228,7 @@ if __name__ == "__main__":
         "https://www.twitch.tv/videos/2687840344",
         "https://twitcasting.tv/shino_nome22/movie/831202251",
         "https://www.youtube.com/watch?v=QFDgL7R2nk4",
+        "https://www.youtube.com/watch?v=X3FkUzf1Hxk"
     ]
     
     for target_url in test_urls:

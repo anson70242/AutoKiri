@@ -28,11 +28,26 @@ class DownloadPipeline:
             print("[Error] Metadata 解析失败，程序终止。")
             return {}
 
+        creator = metadata.get("creator", "Unknown")
+        title = metadata.get("title", "UnknownTitle")
+
+        # 👇 拦截机制：如果是 Unknown，极大概率是 Cookie 失效被墙了
+        if creator == "Unknown":
+            print(f"\n[Warning] ⚠️ 识别到未知的实况主或异常标题: {title}")
+            print("如果这是会限影片，这通常意味着你的 Cookie / Token 已失效！")
+            ans = input("❓ 是否仍要继续创建文件夹并尝试下载？(y/N): ").strip().lower()
+            if ans != 'y':
+                print("[Info] 任务已取消，不会产生任何多余的空文件夹。")
+                return {}
+
         output_dir = self.config.get_output_dir(
-            metadata.get("creator", "Unknown"),
+            creator,
             metadata.get("date", "UnknownDate"),
-            metadata.get("title", "UnknownTitle")
+            title
         )
+        
+        # 👇 延迟创建：只有通过了上面的拦截，才真正建立文件夹
+        output_dir.mkdir(parents=True, exist_ok=True)
         print(f"[Info] 设定保存路径: {output_dir}")
 
         platform = metadata["platform"]
@@ -61,6 +76,17 @@ class DownloadPipeline:
 
         if not chat_path and (download_video and not video_path):
              print("[Error] 影片和弹幕均未能获取！提前终止。")
+             
+             # 👇 自动清理机制：如果下载组件彻底失败，且没留下任何文件，就删掉空文件夹
+             try:
+                 if output_dir.exists() and not any(output_dir.iterdir()):
+                     output_dir.rmdir()
+                     # 尝试连同上一级的日期文件夹一并清理
+                     if not any(output_dir.parent.iterdir()):
+                         output_dir.parent.rmdir()
+                     print(f"[Info] 已自动清理下载失败产生的空文件夹。")
+             except Exception:
+                 pass
              return {}
 
         print("\n" + "-" * 60)
@@ -111,16 +137,14 @@ class HighlightPipeline:
         whisper_exe = self.config.get_tool_exe("faster_whisper", "faster-whisper-xxl/faster-whisper-xxl.exe")
         transcriber = WhisperTranscriber(whisper_exe)
         
-        # 调用大模型生成 SRT
-        srt_path = transcriber.transcribe(video_path, language="ja", model="large-v3-turbo")
-
-        # 预留：步骤 2 - 结合 srt_path 和 chat_path 构建 Prompt
-        # 预留：步骤 3 - 发送给 LLM 获取高光时间轴
+        srt_path = transcriber.transcribe(
+            video_path, 
+            whisper_config=self.config.whisper_config
+        )
 
         return {
             "srt_path": srt_path
         }
-
 
 class TotalPipeline:
     """一条龙服务：串联 Download 和 Highlight"""

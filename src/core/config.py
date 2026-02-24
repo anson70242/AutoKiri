@@ -10,6 +10,7 @@ class ConfigManager:
         self.config_data = self._load_yaml()
         self.tools_paths = self.config_data.get("tools_paths", {})
         self.streamers = self.config_data.get("streamers", [])
+        self.whisper_config = self.config_data.get("whisper", {})
 
     def _load_yaml(self) -> dict:
         config_path = self.project_root / "config.yaml"
@@ -36,5 +37,5 @@ class ConfigManager:
         safe_title = self.sanitize_filename(title)
         
         output_dir = self.project_root / "videos" / safe_creator / safe_date / safe_title
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir

@@ -8,3 +8,4 @@ src/models/
 test_output/
 secret/*.txt
 tools/Faster-Whisper-XXL/
+!tools/Faster-Whisper-XXL/license.txt
