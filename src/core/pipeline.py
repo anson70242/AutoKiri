@@ -185,6 +185,8 @@ class TotalPipeline:
 
         # 2. 如果视频下载成功，无缝衔接跑 AI 分析
         if video_path:
+            if not chat_path:
+                print("\n[Info] ⚠️ 弹幕文件缺失，AI 分析将仅依赖 Whisper 语音识别结果进行。")
             self.highlighter.process(video_path, chat_path)
             
         print("\n" + "=" * 60)

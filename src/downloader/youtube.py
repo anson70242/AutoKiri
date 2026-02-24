@@ -111,7 +111,13 @@ class YoutubeDownloader(BaseDownloader):
                 print(f"[Success] 弹幕/字幕下载成功: {check_path.name}")
                 return check_path
                 
-        print("[Warning] 未找到弹幕或字幕文件，可能该视频未提供。")
+        # 👇 针对 YouTube 的特性，增加更详细的提示
+        print("\n[Warning] 未找到弹幕或字幕文件！")
+        print("💡 原因可能是：")
+        print("   1. 直播刚刚结束，YouTube 尚未完成弹幕/字幕的处理 (通常需要几小时)。")
+        print("   2. 该视频确实没有提供弹幕或字幕。")
+        print("💡 建议：您可以先让程序完成视频下载和语音识别，几个小时后再使用 chat_only.py 单独补充弹幕。")
+        
         return None
 
 # === 快速测试区块 ===
