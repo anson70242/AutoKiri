@@ -97,7 +97,23 @@ class BaseDownloader(ABC):
         filename = f"[{date_str}][{creator}] {safe_title}{suffix}.{ext}"
         return self.output_dir / filename
     
-    def run_command(self, command: list, env: Optional[Dict[str, str]] = None) -> bool:
+    def _get_node_env(self) -> dict:
+        """
+        共用：构造包含内置 Node.js 路径的临时环境变量
+        供 yt-dlp 和 TwitchDownloaderCLI 解析和抓取时使用
+        """
+        env = os.environ.copy()
+        try:
+            # 这里调用你写好的 get_tool_path，自带异常检查
+            node_exe = self.get_tool_path("node") 
+            node_dir = os.path.dirname(str(node_exe))
+            env["PATH"] = f"{node_dir}{os.pathsep}{env.get('PATH', '')}"
+        except Exception:
+            # 如果没配置 Node.js 路径，静默跳过
+            pass 
+        return env
+
+    def run_command(self, command: list, env: Optional[dict] = None) -> bool:
         """
         公共的命令行执行辅助方法
         :param command: 命令列表
@@ -105,8 +121,9 @@ class BaseDownloader(ABC):
         """
         try:
             print(f"[Exec] 执行命令: {' '.join(str(c) for c in command)}")
-            # 将 env 传给 subprocess
-            subprocess.run(command, check=True, env=env)
+            # 关键修改：如果没有传入专属 env，就默认带上 Node.js 环境
+            exec_env = env if env else self._get_node_env()
+            subprocess.run(command, check=True, env=exec_env)
             return True
         except subprocess.CalledProcessError as e:
             print(f"[Error] 命令执行失败，返回码: {e.returncode}")

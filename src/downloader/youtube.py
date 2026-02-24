@@ -8,20 +8,6 @@ from .base import BaseDownloader
 class YoutubeDownloader(BaseDownloader):
     """YouTube 平台专用的下载器"""
 
-    def _get_custom_env(self) -> dict:
-        """
-        构造包含内置 Node.js 路径的临时环境变量
-        """
-        env = os.environ.copy()
-        try:
-            node_exe = self.get_tool_path("node")
-            node_dir = os.path.dirname(str(node_exe))
-            env["PATH"] = f"{node_dir}{os.pathsep}{env.get('PATH', '')}"
-        except Exception as e:
-            # 如果仅仅是没有 Node.js，只打印警告，不影响基础运行
-            pass 
-        return env
-
     def download_video(self) -> Optional[Path]:
         url = self.metadata.get("original_url")
         if not url:
@@ -52,11 +38,9 @@ class YoutubeDownloader(BaseDownloader):
             url
         ]
         
-        custom_env = self._get_custom_env()
-        
         # 1. 尝试无 Cookie 下载
         print("[Info] 尝试普通下载模式...")
-        success = self.run_command(base_command, env=custom_env)
+        success = self.run_command(base_command)
         
         # 2. 如果失败，尝试挂载 Cookie 重新下载
         if not success:
@@ -105,11 +89,9 @@ class YoutubeDownloader(BaseDownloader):
             url
         ]
         
-        custom_env = self._get_custom_env()
-        
         # 1. 尝试无 Cookie 获取弹幕
         print("[Info] 尝试普通模式获取弹幕...")
-        success = self.run_command(base_command, env=custom_env)
+        success = self.run_command(base_command)
         
         # 2. 如果失败，尝试挂载 Cookie 重新获取
         if not success:

@@ -17,17 +17,6 @@ class TwitchDownloader(BaseDownloader):
             load_dotenv(env_path)
         return os.getenv("twitch_OAuth") or os.getenv("TWITCH_OAUTH")
 
-    def _get_custom_env(self) -> dict:
-        """构造包含内置 Node.js 路径的临时环境变量"""
-        env = os.environ.copy()
-        try:
-            node_exe = self.get_tool_path("node")
-            node_dir = os.path.dirname(str(node_exe))
-            env["PATH"] = f"{node_dir}{os.pathsep}{env.get('PATH', '')}"
-        except Exception:
-            pass
-        return env
-
     def download_video(self) -> Optional[Path]:
         url = self.metadata.get("original_url")
         if not url:

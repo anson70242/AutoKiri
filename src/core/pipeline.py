@@ -4,6 +4,7 @@ from src.core.config import ConfigManager
 from src.downloader.metadata import MetadataManager
 from src.downloader.youtube import YoutubeDownloader
 from src.downloader.twitch import TwitchDownloader
+from src.downloader.twitcast import TwitcastDownloader
 from src.post_process.youtube_chat_parser import YoutubeChatParser
 from src.post_process.twitch_chat_parser import TwitchChatParser
 from src.post_process.video_splitter import VideoSplitter
@@ -46,6 +47,9 @@ class AutoKiriPipeline:
         elif platform == "twitch":
             downloader = TwitchDownloader(self.project_root, metadata, output_dir, tools_paths_dict)
             chat_parser = TwitchChatParser()
+        elif platform == "twitcast":
+            downloader = TwitcastDownloader(self.project_root, metadata, output_dir, tools_paths_dict)
+            chat_parser = None # TwitCasting 没有 JSON 弹幕需要清洗
         else:
             print(f"[Error] 暂不支持的平台: {platform}")
             return
@@ -67,9 +71,17 @@ class AutoKiriPipeline:
         print(">>> [步骤 3] 清洗弹幕文件 ...")
         print("-" * 60)
         
-        if chat_path and chat_path.exists():
+        # 执行清洗
+        print("\n" + "-" * 60)
+        print(">>> [步骤 3] 清洗弹幕文件 ...")
+        print("-" * 60)
+        
+        # 修正：chat_parser が存在する場合（Noneではない場合）のみ parse を実行する
+        if chat_parser and chat_path and chat_path.exists():
             parsed_chat_path = chat_path.with_name(chat_path.name.replace("_chat", "_chat_parsed")).with_suffix(".json") 
             chat_parser.parse(chat_path, parsed_chat_path)
+        else:
+            print("[Info] 当前平台无需或暂不支持 JSON 弹幕清洗，已跳过。")
 
         # 仅在完整模式下切片
         if download_video:
