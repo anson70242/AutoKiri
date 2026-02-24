@@ -9,6 +9,7 @@ from src.post_process.youtube_chat_parser import YoutubeChatParser
 from src.post_process.twitch_chat_parser import TwitchChatParser
 from src.post_process.video_splitter import VideoSplitter
 from src.highlight_cliper.transcriber import WhisperTranscriber
+from src.highlight_cliper.srt_splitter import SrtSplitter
 
 class DownloadPipeline:
     """专职负责：解析 Metadata -> 下载影片与弹幕 -> 弹幕清洗 -> 影片切割"""
@@ -142,8 +143,29 @@ class HighlightPipeline:
             whisper_config=self.config.whisper_config
         )
 
+        #  =========== 新增：步骤 2 字幕切割与 Prompt 部署 =========== 
+        split_files = []
+        if srt_path and Path(srt_path).exists():
+            print("\n" + "-" * 60)
+            print(">>> [AI 管线 - 步骤 2] 均分字幕文件与部署 Prompt ...")
+            print("-" * 60)
+            
+            splitter = SrtSplitter(max_blocks=500)
+            split_files = splitter.split_srt(Path(srt_path))
+            
+            # 读取 config 中配置的 Prompt 路径
+            prompt_analyze = self.config.get_prompt_path("speech_analyze")
+            prompt_sentence = self.config.get_prompt_path("to_excel")
+            
+            valid_prompts = [p for p in [prompt_analyze, prompt_sentence] if p is not None]
+            
+            # 部署 Prompt 到和 SRT 相同的资料夹下
+            splitter.copy_prompts(Path(srt_path).parent, valid_prompts)
+        #  ========================================================= 
+
         return {
-            "srt_path": srt_path
+            "srt_path": srt_path,
+            "split_srt_paths": split_files
         }
 
 class TotalPipeline:

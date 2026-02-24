@@ -28,6 +28,10 @@ whisper:
   vad_threshold: 0.35
   vad_min_speech_duration_ms: 250
 
+prompts:
+  speech_analyze: "src/highlight_cliper/prompt/speech_analyze.md"
+  to_excel: "src/highlight_cliper/prompt/to_excel.md"
+
 tools_paths:
   yt_dlp: "yt-dlp/yt-dlp.exe"
   twitch_downloader_cli: "TwitchDownloaderCLI/TwitchDownloaderCLI.exe"

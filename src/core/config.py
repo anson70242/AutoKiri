@@ -11,6 +11,7 @@ class ConfigManager:
         self.tools_paths = self.config_data.get("tools_paths", {})
         self.streamers = self.config_data.get("streamers", [])
         self.whisper_config = self.config_data.get("whisper", {})
+        self.prompts_paths = self.config_data.get("prompts", {})
 
     def _load_yaml(self) -> dict:
         config_path = self.project_root / "config.yaml"
@@ -24,6 +25,13 @@ class ConfigManager:
         """获取工具的绝对路径"""
         rel_path = self.tools_paths.get(tool_name, default_path)
         return self.project_root / "tools" / rel_path
+    
+    def get_prompt_path(self, prompt_key: str) -> Path:
+        """新增：获取 Prompt Markdown 文件的绝对路径"""
+        rel_path = self.prompts_paths.get(prompt_key)
+        if rel_path:
+            return self.project_root / rel_path
+        return None
 
     @staticmethod
     def sanitize_filename(name: str) -> str:
