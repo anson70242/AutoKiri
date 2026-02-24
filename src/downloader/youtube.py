@@ -49,7 +49,7 @@ class YoutubeDownloader(BaseDownloader):
                 print("[Warning] 普通下载失败(可能为会员限定或年龄限制)，尝试挂载 youtube_cookie.txt 重试...")
                 # 将 --cookies 参数插入到 url 前面
                 retry_command = base_command[:-1] + ["--cookies", str(cookie_file), url]
-                success = self.run_command(retry_command, env=custom_env)
+                success = self.run_command(retry_command)
             else:
                 print("[Error] 下载失败，且未找到 youtube_cookie.txt 提供权限。")
         
@@ -99,7 +99,7 @@ class YoutubeDownloader(BaseDownloader):
             if cookie_file.exists():
                 print("[Warning] 获取弹幕失败，尝试挂载 youtube_cookie.txt 重试...")
                 retry_command = base_command[:-1] + ["--cookies", str(cookie_file), url]
-                success = self.run_command(retry_command, env=custom_env)
+                success = self.run_command(retry_command)
             else:
                 print("[Error] 弹幕获取失败，且未找到 youtube_cookie.txt。")
         
