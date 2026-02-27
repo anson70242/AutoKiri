@@ -1,7 +1,19 @@
 # src/core/config.py
+import sys
+import os
 import re
 import yaml
 from pathlib import Path
+
+def get_base_path() -> Path:
+    """智能获取运行路径：兼容源码运行与 EXE 运行"""
+    if getattr(sys, 'frozen', False):
+        # 如果是 EXE 运行，获取 EXE 所在的目录
+        return Path(sys.executable).resolve().parent
+    else:
+        # 如果是源码运行，当前文件在 src/core/config.py
+        # 所以根目录是它的 上级(core) 的 上级(src) 的 上级(根目录)
+        return Path(__file__).resolve().parent.parent.parent
 
 class ConfigManager:
     """全局配置与路径管理器"""

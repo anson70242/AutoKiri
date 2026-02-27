@@ -1,7 +1,7 @@
 # config.yaml
 streamers:
-  # Youtube_channel_id: (yt-dlp --print channel_id [video link])
-  # Supported platforms: youtube, twitch, twitcast
+  # 提示：Youtube_channel_id 可通过 yt-dlp --print channel_id [视频链接] 获取
+  # 目前支持平台: youtube, twitch, twitcast
   - name: "Yuka"
     accounts:
       - platform: "youtube"
@@ -30,10 +30,12 @@ whisper:
   vad_min_speech_duration_ms: 250
 
 prompts:
+  # 路径相对于项目根目录
   speech_analyze: "src/highlight_cliper/prompt/speech_analyze.md"
   to_excel: "src/highlight_cliper/prompt/to_excel.md"
 
 tools_paths:
+  # 注意：程序会自动在以下路径前加上 /tools/ 文件夹名
   yt_dlp: "yt-dlp/yt-dlp.exe"
   twitch_downloader_cli: "TwitchDownloaderCLI/TwitchDownloaderCLI.exe"
   ffmpeg: "ffmpeg-8.0.1-essentials_build/bin/ffmpeg.exe"

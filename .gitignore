@@ -1,10 +1,22 @@
+# 隐私与密钥
 .env
-videos/
-logs/
-*.log
-__pycache__/
-.cache/
-test_output/
-secret/*.txt
+secret/
+*.cookies
+youtube_cookies.txt
+
+# 工具
 tools/Faster-Whisper-XXL/
 !tools/Faster-Whisper-XXL/license.txt
+
+# 运行产生的数据
+logs/
+videos/
+test_output/
+__pycache__/
+.cache/
+*.pyc
+*.log
+
+# 其他
+*.exe
+build.bat
