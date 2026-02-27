@@ -6,7 +6,7 @@ def main():
     url = input("\n🔗 请输入要处理的影片链接: ").strip()
     if url:
         pipeline = DownloadPipeline(Path(__file__).resolve().parent)
-        pipeline.process(url, download_video=False)  # 关键差异：这里传 False
+        pipeline.process(url, download_video=False, download_chat=True)  # 关键差异：这里传 False
 
 if __name__ == "__main__":
     main()

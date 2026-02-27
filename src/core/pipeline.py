@@ -19,7 +19,9 @@ class DownloadPipeline:
         self.config = ConfigManager(project_root)
         self.metadata_manager = MetadataManager(project_root)
 
-    def process(self, url: str, download_video: bool = True) -> dict:
+    def process(self, url: str, 
+                download_video: bool = True, 
+                download_chat: bool = True) -> dict:
         print("\n" + "-" * 60)
         print(">>> [下载管线 - 步骤 1] 解析影片元数据 ...")
         print("-" * 60)
@@ -73,7 +75,7 @@ class DownloadPipeline:
         print("-" * 60)
         
         video_path = downloader.download_video() if download_video else None
-        chat_path = downloader.download_chat()
+        chat_path = downloader.download_chat() if download_chat else None
 
         if not chat_path and (download_video and not video_path):
              print("[Error] 影片和弹幕均未能获取！提前终止。")
@@ -150,7 +152,7 @@ class HighlightPipeline:
             print(">>> [AI 管线 - 步骤 2] 均分字幕文件与部署 Prompt ...")
             print("-" * 60)
             
-            splitter = SrtSplitter(max_blocks=500)
+            splitter = SrtSplitter(max_blocks=800)
             split_files = splitter.split_srt(Path(srt_path))
             
             # 读取 config 中配置的 Prompt 路径
@@ -190,5 +192,5 @@ class TotalPipeline:
             self.highlighter.process(video_path, chat_path)
             
         print("\n" + "=" * 60)
-        print(f"🎉 一条龙任务全部执行完毕！")
+        print(f"🎉 全流程全部执行完毕！")
         print("=" * 60)

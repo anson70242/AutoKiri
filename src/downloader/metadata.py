@@ -72,11 +72,9 @@ class YtdlpExtractor(BaseMetadataExtractor):
         # 基础命令
         command = [str(self.exe_path), "-j", "--no-warnings", "--ignore-no-formats-error"]
         
-        # ========== 新增：检查并挂载 Cookie ==========
-        cookie_file = self.project_root / "secret" / "youtube_cookies.txt"
-        if cookie_file.exists():
-            print("[Info] 检测到 youtube_cookies.txt，尝试以授权身份获取 Metadata...")
-            command.extend(["--cookies", str(cookie_file)])
+        # ========== 新增：检查 Cookie ==========
+        print("[Info] 尝试从 Firefox 浏览器获取 Cookie 进行授权解析...")
+        command.extend(["--cookies-from-browser", "firefox"])
         # ==========================================
         
         command.append(url)

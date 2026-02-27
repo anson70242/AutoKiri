@@ -44,14 +44,13 @@ class YoutubeDownloader(BaseDownloader):
         
         # 2. 如果失败，尝试挂载 Cookie 重新下载
         if not success:
-            cookie_file = self.project_root / "secret" / "youtube_cookies.txt"
-            if cookie_file.exists():
-                print("[Warning] 普通下载失败(可能为会员限定或年龄限制)，尝试挂载 youtube_cookie.txt 重试...")
-                # 将 --cookies 参数插入到 url 前面
-                retry_command = base_command[:-1] + ["--cookies", str(cookie_file), url]
-                success = self.run_command(retry_command)
-            else:
-                print("[Error] 下载失败，且未找到 youtube_cookie.txt 提供权限。")
+            print("[Warning] 普通下载失败(可能为会员限定或年龄限制)，尝试从 Firefox 读取 Cookie 重试...")
+            # 将 --cookies-from-browser firefox 插入到 url 前面
+            retry_command = base_command[:-1] + ["--cookies-from-browser", "firefox", url]
+            success = self.run_command(retry_command)
+            
+            if not success:
+                print("[Error] 使用 Firefox Cookie 下载依然失败，请确认浏览器中已登录相应的账号。")
         
         # 检查最终结果
         if success and output_path.exists():
@@ -68,6 +67,7 @@ class YoutubeDownloader(BaseDownloader):
             return None
             
         ytdlp_exe = self.get_tool_path("yt_dlp")
+        node_exe = self.get_tool_path("node")
         
         base_output_template = self.generate_output_path(suffix="_chat", ext="%(ext)s")
         expected_live_chat_path = self.generate_output_path(suffix="_chat", ext="live_chat.json")
@@ -95,13 +95,12 @@ class YoutubeDownloader(BaseDownloader):
         
         # 2. 如果失败，尝试挂载 Cookie 重新获取
         if not success:
-            cookie_file = self.project_root / "secret" / "youtube_cookies.txt"
-            if cookie_file.exists():
-                print("[Warning] 获取弹幕失败，尝试挂载 youtube_cookie.txt 重试...")
-                retry_command = base_command[:-1] + ["--cookies", str(cookie_file), url]
-                success = self.run_command(retry_command)
-            else:
-                print("[Error] 弹幕获取失败，且未找到 youtube_cookie.txt。")
+            print("[Warning] 获取弹幕失败，尝试从 Firefox 读取 Cookie 重试...")
+            retry_command = base_command[:-1] + ["--cookies-from-browser", "firefox", url]
+            success = self.run_command(retry_command)
+            
+            if not success:
+                print("[Error] 使用 Firefox Cookie 获取依然失败，请确认浏览器中已登录相应的账号。")
         
         # 验证文件是否成功生成
         possible_extensions = ["live_chat.json", "ja.vtt", "en.vtt", "json", "vtt"]

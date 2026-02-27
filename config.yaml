@@ -1,6 +1,7 @@
 # config.yaml
 streamers:
   # Youtube_channel_id: (yt-dlp --print channel_id [video link])
+  # Supported platforms: youtube, twitch, twitcast
   - name: "Yuka"
     accounts:
       - platform: "youtube"
