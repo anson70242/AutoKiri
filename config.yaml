@@ -31,8 +31,15 @@ whisper:
 
 prompts:
   # 路径相对于项目根目录
+  # Gemini 相关提示词
   speech_analyze: "src/highlight_cliper/prompt/speech_analyze.md"
   to_excel: "src/highlight_cliper/prompt/to_excel.md"
+
+  # Translater 相关提示词
+  translater: "src/agents/translater/prompt/translater.md"
+
+  # Highlight Cliper 相关提示词
+  highlight_cliper: "src/agents/cliper/prompt/highlight_cliper.md"
 
 tools_paths:
   # 注意：程序会自动在以下路径前加上 /tools/ 文件夹名
