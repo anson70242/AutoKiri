@@ -42,6 +42,8 @@ agents:
       llm_engine: "ollama"
       server_host: "http://localhost:11434"
       model: "qwen3:14b"
+      options:
+        temperature: 0.7
 
   - highlight_cliper:
       llm_engine: "ollama"
