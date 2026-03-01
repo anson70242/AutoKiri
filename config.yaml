@@ -9,9 +9,6 @@ streamers:
 
       - platform: "twitch"
         channel_name: "柊優花 (hiiragiyukaofficial)"
-
-      - platform: "twitter"
-        channel_name: "@hiiragi_yuka530"
         
   - name: "Haru"
     accounts:
