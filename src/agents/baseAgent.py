@@ -9,11 +9,12 @@ class BaseAgent(ABC):
     所有 Ollama Agent 的基础逻辑类。
     支持基础请求、强制 JSON 输出，以及通用的 Map-Reduce 任务流程。
     """
-    def __init__(self, host: str = "http://localhost:11434", model: str = "qwen3:14b", timeout: int = 300):
+    def __init__(self, host: str = "http://localhost:11434", model: str = "qwen3:14b", timeout: int = 300, options: dict = None):
         # 移除结尾可能的斜杠，确保拼接正确
         self.host = host.rstrip('/')
         self.model = model
         self.timeout = timeout
+        self.options = options or {}  # 接收从 config 传来的 options
         self.api_url = f"{self.host}/api/chat"
 
     def check_connection(self) -> bool:
@@ -27,20 +28,27 @@ class BaseAgent(ABC):
         except requests.RequestException:
             return False
 
-    def chat(self, messages: List[Dict[str, str]], temperature: float = 0.3, json_format: bool = False) -> str:
+    def chat(self, messages: List[Dict[str, str]], temperature: float = None, json_format: bool = False) -> str:
         """
         调用 Ollama Chat API 的基础方法
         :param messages: 对话历史 [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
-        :param temperature: 温度，预设 0.3 降低发散，使格式更稳定
+        :param temperature: 温度，预设覆盖 config 的对应设置；若都不传，则默认 0.3
         :param json_format: 是否要求 LLM 强制返回 JSON 对象
         """
+        # 复制实例化的配置，避免修改到原有的字典
+        chat_options = self.options.copy()
+        
+        # 如果方法被单独传入了 temperature，则覆盖 options 里的设置 (如 map_reduce 指定的 0.1)
+        if temperature is not None:
+            chat_options["temperature"] = temperature
+        elif "temperature" not in chat_options:
+            chat_options["temperature"] = 0.3
+
         payload = {
             "model": self.model,
             "messages": messages,
             "stream": False,
-            "options": {
-                "temperature": temperature
-            }
+            "options": chat_options
         }
         
         # Ollama 支持设定 format: "json" 强制限定输出结构
@@ -74,8 +82,10 @@ class BaseAgent(ABC):
                 {"role": "user", "content": payload}
             ]
             
-            # 向 LLM 拿取结果
+            # 向 LLM 拿取结果 (这里的 0.1 会覆盖掉实例化时 config 传入的温度)
             res_text = self.chat(messages, temperature=0.1, json_format=is_json_output)
+
+            print(f"      [Debug] LLM 返回截取: {res_text[:150]}...")
             
             if is_json_output:
                 try:

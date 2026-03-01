@@ -24,6 +24,7 @@ class ConfigManager:
         self.streamers = self.config_data.get("streamers", [])
         self.whisper_config = self.config_data.get("whisper", {})
         self.prompts_paths = self.config_data.get("prompts", {})
+        self.agents_config = self.config_data.get("agents", [])
 
     def _load_yaml(self) -> dict:
         config_path = self.project_root / "config.yaml"
@@ -44,6 +45,16 @@ class ConfigManager:
         if rel_path:
             return self.project_root / rel_path
         return None
+    
+    def get_agent_config(self, agent_name: str) -> dict:
+        """
+        新增：获取指定的 Agent 配置
+        :param agent_name: 代理键名，如 'translater' 或 'highlight_cliper'
+        """
+        for agent in self.agents_config:
+            if agent_name in agent:
+                return agent[agent_name]
+        return {}
 
     @staticmethod
     def sanitize_filename(name: str) -> str:
