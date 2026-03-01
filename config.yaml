@@ -1,7 +1,7 @@
 # config.yaml
 streamers:
   # 提示：Youtube_channel_id 可通过 yt-dlp --print channel_id [视频链接] 获取
-  # 目前支持平台: youtube, twitch, twitcast
+  # 目前支持平台: youtube, twitch, twitcast, twitter(x)
   - name: "Yuka"
     accounts:
       - platform: "youtube"
@@ -9,6 +9,9 @@ streamers:
 
       - platform: "twitch"
         channel_name: "柊優花 (hiiragiyukaofficial)"
+
+      - platform: "twitter"
+        channel_name: "@hiiragi_yuka530"
         
   - name: "Haru"
     accounts:
