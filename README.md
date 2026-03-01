@@ -16,7 +16,8 @@ AutoKiri 是一个专为直播回放（Archive/VOD）设计的自动化工具，
 
 ## ⚡ 快速开始 (EXE 版本)
 1. 配置文件：将 `.env.example` 重命名为 `.env`(不需加任何前缀) 并填入你的 `Twitch Token`。
-2. 对于 YouTube 会员限定影片，`请下载firefox浏览器并登入Youtube账号`
+2. 对于 YouTube 会员限定影片，`请下载firefox浏览器并登入Youtube账号` 
+    - (Chrome, Edge目前不支援自动获取Cookie)
 3. 运行：双击 `AutoKiri-Main.exe`，粘贴直播链接，按下回车。
 
 ## 🛠️ 环境准备与安装

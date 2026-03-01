@@ -41,8 +41,6 @@ class BaseAgent(ABC):
         # 如果方法被单独传入了 temperature，则覆盖 options 里的设置 (如 map_reduce 指定的 0.1)
         if temperature is not None:
             chat_options["temperature"] = temperature
-        elif "temperature" not in chat_options:
-            chat_options["temperature"] = 0.3
 
         payload = {
             "model": self.model,
@@ -83,7 +81,7 @@ class BaseAgent(ABC):
             ]
             
             # 向 LLM 拿取结果 (这里的 0.1 会覆盖掉实例化时 config 传入的温度)
-            res_text = self.chat(messages, temperature=0.1, json_format=is_json_output)
+            res_text = self.chat(messages, json_format=is_json_output)
 
             print(f"      [Debug] LLM 返回截取: {res_text[:150]}...")
             
