@@ -1,9 +1,8 @@
 # highlight_only.py
 import os
 import traceback
-from src.core.config import get_base_path
 from pathlib import Path
-from src.core.pipeline import HighlightPipeline
+from src.core import get_base_path, HighlightPipeline
 
 
 def main():

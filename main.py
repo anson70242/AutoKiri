@@ -1,8 +1,7 @@
 # main.py
 import os
 import traceback
-from src.core.config import get_base_path
-from src.core.pipeline import TotalPipeline
+from src.core import get_base_path, TotalPipeline
 
 def main():
     print("=" * 60 + "\n       AutoKiri-Flow [全流程]       \n" + "=" * 60)

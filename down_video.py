@@ -1,8 +1,7 @@
 # down_video.py
 import os
 import traceback
-from src.core.config import get_base_path
-from src.core.pipeline import DownloadPipeline
+from src.core import get_base_path, DownloadPipeline
 
 def main():
     print("=" * 60 + "\n       AutoKiri-Flow [仅影片模式]       \n" + "=" * 60)

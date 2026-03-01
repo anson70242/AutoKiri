@@ -1,8 +1,7 @@
 # video_chat.py
 import os
 import traceback
-from src.core.config import get_base_path
-from src.core.pipeline import DownloadPipeline
+from src.core import get_base_path, DownloadPipeline
 
 
 def main():

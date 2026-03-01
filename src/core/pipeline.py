@@ -1,15 +1,9 @@
 # src/core/pipeline.py
 from pathlib import Path
-from src.core.config import ConfigManager
-from src.downloader.metadata import MetadataManager
-from src.downloader.youtube import YoutubeDownloader
-from src.downloader.twitch import TwitchDownloader
-from src.downloader.twitcast import TwitcastDownloader
-from src.post_process.youtube_chat_parser import YoutubeChatParser
-from src.post_process.twitch_chat_parser import TwitchChatParser
-from src.post_process.video_splitter import VideoSplitter
-from src.highlight_cliper.transcriber import WhisperTranscriber
-from src.highlight_cliper.srt_splitter import SrtSplitter
+from src.core import ConfigManager
+from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader, TwitcastDownloader
+from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
+from src.highlight_cliper import WhisperTranscriber, SrtSplitter
 
 class DownloadPipeline:
     """专职负责：解析 Metadata -> 下载影片与弹幕 -> 弹幕清洗 -> 影片切割"""
