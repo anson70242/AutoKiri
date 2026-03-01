@@ -12,6 +12,7 @@ tools/Faster-Whisper-XXL/
 logs/
 videos/
 test_output/
+src/agents/test/
 __pycache__/
 .cache/
 *.pyc

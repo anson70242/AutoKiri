@@ -29,6 +29,17 @@ whisper:
   vad_threshold: 0.35
   vad_min_speech_duration_ms: 250
 
+llm:
+# GPU_Memory: 
+# - 22GB 及以上的显卡推荐使用 qwen3:32b 模型
+# - 12GB 及以上的显卡推荐使用 qwen3:14b 模型
+# - 12GB 以下的显卡推荐使用 qwen3:8b 模型，虽然效果略逊一筹，但更适合资源有限的环境
+  translate_model:
+    target_language: qwen3:14b
+    server_host: "http://localhost:11434"
+    chunk_size: 100
+    overlap: 10
+
 prompts:
   # 路径相对于项目根目录
   # Gemini 相关提示词

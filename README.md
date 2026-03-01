@@ -15,7 +15,7 @@ AutoKiri 是一个专为直播回放（Archive/VOD）设计的自动化工具，
 2. TwitCasting聊天室抓取功能实现较为复杂，目前不支援
 
 ## ⚡ 快速开始 (EXE 版本)
-1. 配置文件：将 `.env.example` 重命名为 `.env` 并填入你的 `Twitch Token`。
+1. 配置文件：将 `.env.example` 重命名为 `.env`(不需加任何前缀) 并填入你的 `Twitch Token`。
 2. 对于 YouTube 会员限定影片，`请下载firefox浏览器并登入Youtube账号`
 3. 运行：双击 `AutoKiri-Main.exe`，粘贴直播链接，按下回车。
 
@@ -25,7 +25,7 @@ AutoKiri 是一个专为直播回放（Archive/VOD）设计的自动化工具，
 
 ### 1. 基础配置 (.env)
 
-在程序根目录下建立一个名为 `.env` 的文件，并填入你的 Twitch 授权信息：
+在程序根目录下建立一个名为 `.env` 的文件(不需加任何前缀)，并填入你的 Twitch 授权信息：
 
 ```env
 twitch_OAuth="你的TwitchOAuth"
@@ -33,7 +33,7 @@ twitch_OAuth="你的TwitchOAuth"
 
 **如何获取 Twitch OAuth？**
 
-1. 在浏览器登录 Twitch 账号。
+1. 在浏览器登录 Twitch 账号，并打开 Twitch 页面。
 2. 按下 `F12` 打开开发者工具。
 3. 点击 **应用程序 (Application)** 选项卡 -> 左侧 **Cookies** -> 找到 `https://www.twitch.tv`。
 4. 在列表中找到名为 `auth-token` 的值，将其复制到 `.env` 文件中。
