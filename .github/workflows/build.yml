@@ -42,8 +42,30 @@ jobs:
         echo "Building AutoKiri-Highlight..."
         python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-Highlight" clip_highlight.py
 
-    - name: Upload EXE Artifacts
+    - name: Assemble Release Package
+      shell: bash
+      run: |
+        echo "创建整合文件夹..."
+        mkdir -p release_package/src/highlight_cliper/prompt
+        mkdir -p release_package/videos
+        
+        echo "整理生成的可执行文件..."
+        mv dist/*.exe release_package/
+        
+        echo "复制必须的配置文件..."
+        cp config.yaml release_package/
+        cp README.md release_package/
+        cp .env.example release_package/
+        
+        echo "复制 Prompt 模板文件..."
+        cp -r src/highlight_cliper/prompt/* release_package/src/highlight_cliper/prompt/
+
+        echo "复制内建的 Tools 工具包..."
+        # 👇 直接把整个 tools 资料夹复制进打包目录
+        cp -r tools release_package/
+
+    - name: Upload AutoKiri Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: AutoKiri-EXEs # 下载时的压缩包名称
-        path: dist/*.exe    # 直接把 dist 文件夹下的所有 exe 抓取上传
+        name: AutoKiri-Full-Release
+        path: release_package/
