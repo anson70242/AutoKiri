@@ -18,12 +18,15 @@ streamers:
       - platform: "twitcast"
         channel_name: "shino_nome22"
 
+      - platform: "twitter"
+        channel_id: "shino_haru101"
+
 whisper:
   language: "ja"
   model: "large-v3-turbo"
   compute_type: "float16"
   beam_size: 5
-  vad_filter: True
+  vad_filter: False
   condition_on_previous_text: False
   no_speech_threshold: 0.5
   vad_threshold: 0.35
@@ -35,8 +38,8 @@ agents:
     tools:
     - name: "chunker"
       path: "src/agents/tools/chunker.py"
-      chunk_size: 50  # 退格，与 path 和 name 对齐
-      overlap: 5      # 退格，与 path 和 name 对齐
+      chunk_size: 50  
+      overlap: 5      
     
   - translater:
       llm_engine: "ollama"

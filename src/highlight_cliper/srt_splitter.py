@@ -54,7 +54,7 @@ class SrtSplitter:
                 else:
                     renumbered_blocks.append(block)
             
-            chunk_path = output_dir / f"{base_name}_part{i+1}.srt"
+            chunk_path = output_dir / f"[Part-{i+1}]{base_name}.srt"
             with open(chunk_path, "w", encoding="utf-8") as f:
                 f.write("\n\n".join(renumbered_blocks) + "\n\n")
                 

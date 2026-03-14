@@ -1,0 +1,49 @@
+name: Build AutoKiri EXEs
+
+# 触发条件：推送到 main 分支，或者在网页端手动点击运行
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest # 强制使用 Windows 环境，确保生成 .exe 文件
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11' # 推荐使用 3.11，兼容性和打包体积较好
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt
+
+    - name: Run PyInstaller (AutoKiri)
+      run: |
+        echo "Building AutoKiri-Main..."
+        python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-Main" main.py
+        
+        echo "Building AutoKiri-Download..."
+        python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-Download" video_chat.py
+        
+        echo "Building AutoKiri-DownVideo..."
+        python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-DownVideo" down_video.py
+        
+        echo "Building AutoKiri-DownChat..."
+        python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-DownChat" down_chat.py
+        
+        echo "Building AutoKiri-Highlight..."
+        python -m PyInstaller --onefile --paths . --clean --name "AutoKiri-Highlight" clip_highlight.py
+
+    - name: Upload EXE Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: AutoKiri-EXEs # 下载时的压缩包名称
+        path: dist/*.exe    # 直接把 dist 文件夹下的所有 exe 抓取上传

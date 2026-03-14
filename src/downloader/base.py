@@ -82,8 +82,8 @@ class BaseDownloader(ABC):
         :param ext: 文件副档名，例如 "mp4" 或 "json"
         
         示例输出: 
-        - 视频: [20250109][Yuka] 直播标题.mp4 (suffix="", ext="mp4")
-        - 弹幕: [20250109][Yuka] 直播标题_chat.json (suffix="_chat", ext="json")
+        - 视频: [youtube][20250109][Yuka] 直播标题.mp4
+        - 弹幕: [twitch][20250109][Yuka] 直播标题_chat.json
         """
         date_str = self.metadata.get("date", "19700101")
         creator = self.metadata.get("creator", "Unknown")
@@ -94,7 +94,9 @@ class BaseDownloader(ABC):
         # 去除多余空格
         safe_title = " ".join(safe_title.split())
         
-        filename = f"[{date_str}][{creator}] {safe_title}{suffix}.{ext}"
+        platform = self.metadata.get("platform", "unknown")
+        filename = f"[{platform}][{date_str}][{creator}] {safe_title}{suffix}.{ext}"
+        
         return self.output_dir / filename
     
     def _get_node_env(self) -> dict:

@@ -4,6 +4,7 @@ from src.core import ConfigManager
 from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader, TwitcastDownloader
 from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
 from src.highlight_cliper import WhisperTranscriber, SrtSplitter
+from src.downloader import TwitterDownloader
 
 class DownloadPipeline:
     """专职负责：解析 Metadata -> 下载影片与弹幕 -> 弹幕清洗 -> 影片切割"""
@@ -28,11 +29,11 @@ class DownloadPipeline:
         creator = metadata.get("creator", "Unknown")
         title = metadata.get("title", "UnknownTitle")
 
-        # 👇 拦截机制：如果是 Unknown，极大概率是 Cookie 失效被墙了
+        # 拦截机制：如果是 Unknown，极大概率是 Cookie 失效被墙了
         if creator == "Unknown":
-            print(f"\n[Warning] ⚠️ 识别到未知的实况主或异常标题: {title}")
+            print(f"\n[Warning]  识别到未知的实况主或异常标题: {title}")
             print("如果这是会限影片，这通常意味着你的 Cookie / Token 已失效！")
-            ans = input("❓ 是否仍要继续创建文件夹并尝试下载？(y/N): ").strip().lower()
+            ans = input(" 是否仍要继续创建文件夹并尝试下载？(y/N): ").strip().lower()
             if ans != 'y':
                 print("[Info] 任务已取消，不会产生任何多余的空文件夹。")
                 return {}
@@ -43,9 +44,20 @@ class DownloadPipeline:
             title
         )
         
-        # 👇 延迟创建：只有通过了上面的拦截，才真正建立文件夹
+        # 延迟创建：只有通过了上面的拦截，才真正建立文件夹
         output_dir.mkdir(parents=True, exist_ok=True)
         print(f"[Info] 设定保存路径: {output_dir}")
+
+        # Create a txt file to store the source link
+        link_file_path = output_dir / f"{self.config.sanitize_filename(title)}_source_link.txt"
+        try:
+            with open(link_file_path, "w", encoding="utf-8") as f:
+                f.write(f"Platform: {platform}\n")
+                f.write(f"Title: {title}\n")
+                f.write(f"URL: {url}\n")
+            print(f"[Info] 已生成連結備忘錄: {link_file_path.name}")
+        except Exception as e:
+            print(f"[Warning] 生成連結文件失敗: {e}")
 
         platform = metadata["platform"]
         tools_paths_dict = self.config.tools_paths
@@ -60,6 +72,12 @@ class DownloadPipeline:
         elif platform == "twitcast":
             downloader = TwitcastDownloader(self.project_root, metadata, output_dir, tools_paths_dict)
             chat_parser = None 
+        elif platform == "twitter":
+            downloader = TwitterDownloader(self.project_root, metadata, output_dir, tools_paths_dict)
+            chat_parser = None
+        elif platform == "tiktok":
+            downloader = None
+            chat_parser = None
         else:
             print(f"[Error] 暂不支持的平台: {platform}")
             return {}
@@ -74,7 +92,7 @@ class DownloadPipeline:
         if not chat_path and (download_video and not video_path):
              print("[Error] 影片和弹幕均未能获取！提前终止。")
              
-             # 👇 自动清理机制：如果下载组件彻底失败，且没留下任何文件，就删掉空文件夹
+             # 自动清理机制：如果下载组件彻底失败，且没留下任何文件，就删掉空文件夹
              try:
                  if output_dir.exists() and not any(output_dir.iterdir()):
                      output_dir.rmdir()
@@ -182,9 +200,9 @@ class TotalPipeline:
         # 2. 如果视频下载成功，无缝衔接跑 AI 分析
         if video_path:
             if not chat_path:
-                print("\n[Info] ⚠️ 弹幕文件缺失，AI 分析将仅依赖 Whisper 语音识别结果进行。")
+                print("\n[Info]  弹幕文件缺失，AI 分析将仅依赖 Whisper 语音识别结果进行。")
             self.highlighter.process(video_path, chat_path)
             
         print("\n" + "=" * 60)
-        print(f"🎉 全流程全部执行完毕！")
+        print(f" 全流程全部执行完毕！")
         print("=" * 60)

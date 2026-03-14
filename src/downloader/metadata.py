@@ -87,6 +87,7 @@ class YtdlpExtractor(BaseMetadataExtractor):
             extractor = raw_data.get("extractor_key", "").lower()
             if "youtube" in extractor: platform = "youtube"
             elif "twitcast" in extractor: platform = "twitcast"
+            elif "twitter" in extractor: platform = "twitter"
             else: platform = "unknown"
 
             # 取出 Uploader 與標題

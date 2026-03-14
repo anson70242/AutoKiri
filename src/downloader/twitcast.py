@@ -47,24 +47,7 @@ class TwitcastDownloader(BaseDownloader):
 
     def download_chat(self) -> Optional[Path]:
         """
-        生成一个包含直播链接的 txt 文件作为替代。
+        由于已在 Pipeline 层统一生成备忘录，此处直接跳过弹幕处理。
         """
-        url = self.metadata.get("original_url")
-        if not url:
-            return None
-            
-        output_path = self.generate_output_path(suffix="_chat_link", ext="txt")
-        
-        if output_path.exists():
-            print(f"[Info] 直播链接信息文件已存在: {output_path.name}")
-            return output_path
-            
-        print(f"[Info] 暂不支持 TwitCasting 弹幕下载，将生成链接备忘录: {output_path.name}")
-        
-        try:
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(f"TwitCasting Stream URL:\n{url}\n")
-            return output_path
-        except Exception as e:
-            print(f"[Error] 写入链接文件失败: {e}")
-            return None
+        print("[Info] TwitCasting 暂不支持弹幕下载，已跳过。")
+        return None
