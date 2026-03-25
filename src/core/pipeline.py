@@ -5,6 +5,7 @@ from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader,
 from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
 from src.highlight_cliper import WhisperTranscriber, SrtSplitter
 from src.downloader import TwitterDownloader
+import subprocess
 
 class DownloadPipeline:
     """专职负责：解析 Metadata -> 下载影片与弹幕 -> 弹幕清洗 -> 影片切割"""
@@ -14,9 +15,48 @@ class DownloadPipeline:
         self.config = ConfigManager(project_root)
         self.metadata_manager = MetadataManager(project_root)
 
+    def _update_ytdlp(self):
+        print("\n" + "-" * 60)
+        print(">>> [下载管线 - 步骤 0] 检查并更新自带的 yt-dlp ...")
+        print("-" * 60)
+        
+        # 严格通过你的 ConfigManager 获取自带 yt-dlp 的绝对路径
+        # 第二个参数请填入你在 tools 下实际存放的相对路径，比如 "tools/yt-dlp.exe"
+        ytdlp_exe = self.config.get_tool_exe("yt-dlp", "tools/yt-dlp.exe") 
+        
+        if not ytdlp_exe or not Path(ytdlp_exe).exists():
+            print(f"[Warning] 找不到自带的 yt-dlp 程序 ({ytdlp_exe})，请检查路径。将跳过更新。")
+            return
+            
+        try:
+            # 执行更新命令
+            result = subprocess.run(
+                [str(ytdlp_exe), "-U"], 
+                capture_output=True, 
+                text=True, 
+                check=True
+            )
+            
+            output = result.stdout.strip() if result.stdout else result.stderr.strip()
+            
+            # yt-dlp 如果是最新的，通常会输出 "... is up to date"
+            if "up to date" in output.lower():
+                print("[Info] 自带的 yt-dlp 已是最新版本。")
+            else:
+                print(f"[Info] 自带的 yt-dlp 更新完毕:\n{output}")
+                
+        except subprocess.CalledProcessError as e:
+            # check=True 会在命令执行失败（返回码非0）时抛出此异常
+            print(f"[Warning] yt-dlp 更新失败 (可能是网络问题或文件被占用)，将继续使用当前版本。\n错误: {e.stderr.strip()}")
+        except Exception as e:
+            print(f"[Warning] 执行 yt-dlp 更新时发生意外错误: {e}")
+
     def process(self, url: str, 
                 download_video: bool = True, 
                 download_chat: bool = True) -> dict:
+        
+        self._update_ytdlp()
+
         print("\n" + "-" * 60)
         print(">>> [下载管线 - 步骤 1] 解析影片元数据 ...")
         print("-" * 60)
