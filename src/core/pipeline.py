@@ -20,9 +20,8 @@ class DownloadPipeline:
         print(">>> [下载管线 - 步骤 0] 检查并更新自带的 yt-dlp ...")
         print("-" * 60)
         
-        # 严格通过你的 ConfigManager 获取自带 yt-dlp 的绝对路径
-        # 第二个参数请填入你在 tools 下实际存放的相对路径，比如 "tools/yt-dlp.exe"
-        ytdlp_exe = self.config.get_tool_exe("yt-dlp", "tools/yt-dlp.exe") 
+        # 获取自带 yt-dlp 的绝对路径
+        ytdlp_exe = self.config.get_tool_exe("yt-dlp", "yt-dlp/yt-dlp.exe") 
         
         if not ytdlp_exe or not Path(ytdlp_exe).exists():
             print(f"[Warning] 找不到自带的 yt-dlp 程序 ({ytdlp_exe})，请检查路径。将跳过更新。")
@@ -88,6 +87,8 @@ class DownloadPipeline:
         output_dir.mkdir(parents=True, exist_ok=True)
         print(f"[Info] 设定保存路径: {output_dir}")
 
+        platform = metadata["platform"]
+
         # Create a txt file to store the source link
         link_file_path = output_dir / f"{self.config.sanitize_filename(title)}_source_link.txt"
         try:
@@ -99,7 +100,6 @@ class DownloadPipeline:
         except Exception as e:
             print(f"[Warning] 生成連結文件失敗: {e}")
 
-        platform = metadata["platform"]
         tools_paths_dict = self.config.tools_paths
 
         # 分配下载器
