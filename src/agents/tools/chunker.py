@@ -53,19 +53,25 @@ class SrtChunker:
             # 计算包含前后 overlap 的实际起止索引
             start_idx = max(0, i - self.overlap)
             end_idx = min(total_blocks, i + self.chunk_size + self.overlap)
-            
+
             chunk_blocks = parsed_blocks[start_idx : end_idx]
-            
+
+            # 核心区间（不含 overlap）：本 chunk 真正“负责”的句子。
+            # overlap 只是给 LLM 当上下文，其译文往往较敷衍，merge 时应只采用核心区间。
+            core_blocks = parsed_blocks[i : min(total_blocks, i + self.chunk_size)]
+            core_ids = [b["id"] for b in core_blocks]
+
             # 只提取行号和文本（过滤掉 start/end 时间轴）
             llm_payload = [{"id": b["id"], "text": b["text"]} for b in chunk_blocks]
-            
+
             chunks.append({
                 "chunk_index": i // step,
                 "start_id": chunk_blocks[0]["id"], # 注意：此时的首尾 ID 是包含了 overlap 的
                 "end_id": chunk_blocks[-1]["id"],
+                "core_ids": core_ids,              # 本 chunk 负责的核心 ID（不含 overlap）
                 "payload_str": json.dumps(llm_payload, ensure_ascii=False)
             })
-            
+
         return chunks
 
     def merge_and_export(self, llm_processed_chunks: List[Any], original_blocks: List[Dict[str, Any]], output_path: str | Path):

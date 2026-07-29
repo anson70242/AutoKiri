@@ -5,6 +5,7 @@ from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader,
 from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
 from src.highlight_cliper import WhisperTranscriber, SrtSplitter
 from src.downloader import TwitterDownloader
+from src.agents.translater import SrtTranslator
 import subprocess
 
 class DownloadPipeline:
@@ -67,6 +68,7 @@ class DownloadPipeline:
 
         creator = metadata.get("creator", "Unknown")
         title = metadata.get("title", "UnknownTitle")
+        video_id = metadata.get("video_id", "UnknownID")
 
         # 拦截机制：如果是 Unknown，极大概率是 Cookie 失效被墙了
         if creator == "Unknown":
@@ -76,11 +78,13 @@ class DownloadPipeline:
             if ans != 'y':
                 print("[Info] 任务已取消，不会产生任何多余的空文件夹。")
                 return {}
+            
+        unique_title = f"{title}_[{video_id}]"
 
         output_dir = self.config.get_output_dir(
             creator,
             metadata.get("date", "UnknownDate"),
-            title
+            unique_title
         )
         
         # 延迟创建：只有通过了上面的拦截，才真正建立文件夹
@@ -215,11 +219,25 @@ class HighlightPipeline:
             
             # 部署 Prompt 到和 SRT 相同的资料夹下
             splitter.copy_prompts(Path(srt_path).parent, valid_prompts)
-        #  ========================================================= 
+        #  =========================================================
+
+        #  =========== 新增：步骤 3 LLM 字幕翻译 (日→中) ===========
+        zh_srt_path = None
+        if srt_path and Path(srt_path).exists():
+            print("\n" + "-" * 60)
+            print(">>> [AI 管线 - 步骤 3] LLM 字幕翻译 (日→中) ...")
+            print("-" * 60)
+            try:
+                translator = SrtTranslator.from_config(self.config)
+                zh_srt_path = translator.translate(Path(srt_path))
+            except Exception as e:
+                print(f"[Warning] 字幕翻译失败，已跳过（不影响其他产物）: {e}")
+        #  =========================================================
 
         return {
             "srt_path": srt_path,
-            "split_srt_paths": split_files
+            "split_srt_paths": split_files,
+            "zh_srt_path": zh_srt_path
         }
 
 class TotalPipeline:
