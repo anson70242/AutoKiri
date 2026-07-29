@@ -12,6 +12,7 @@ LLM 字幕翻译器。
 只依赖 requests（走 OpenAI 兼容的 /chat/completions 端点），无需安装 openai。
 """
 import os
+import sys
 import re
 import json
 import time
@@ -23,8 +24,16 @@ from dotenv import load_dotenv
 
 from src.agents.tools.chunker import SrtChunker
 
+
+def _resolve_project_root() -> Path:
+    """兼容源码运行与 PyInstaller 打包：冻结态取 exe 所在目录，否则取仓库根目录。"""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parents[3]
+
+
 # 加载项目根目录的 .env（LLM 端点 / API Key 存放于此，不写入代码）
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+_PROJECT_ROOT = _resolve_project_root()
 load_dotenv(_PROJECT_ROOT / ".env")
 
 # ------------------------------------------------------------------ #
