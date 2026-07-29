@@ -18,6 +18,20 @@ __pycache__/
 *.pyc
 *.log
 
+# yt-dlp 下载残留（tools/yt-dlp 下只应保留可执行文件，勿混入下载的媒体/字幕/文档）
+tools/yt-dlp/*.mp4
+tools/yt-dlp/*.mkv
+tools/yt-dlp/*.webm
+tools/yt-dlp/*.m4a
+tools/yt-dlp/*.srt
+tools/yt-dlp/*.md
+tools/yt-dlp/*.pdf
+tools/yt-dlp/*.part
+tools/yt-dlp/*.ytdl
+
+# Windows 误建的保留名文件（含带隐藏后缀字符的变体）
+nul*
+
 # 其他
 *.exe
 build.bat
