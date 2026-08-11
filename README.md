@@ -36,7 +36,7 @@ twitch_OAuth="你的TwitchOAuth"
 
 1. 在浏览器登录 Twitch 账号，并打开 Twitch 页面。
 2. 按下 `F12` 打开开发者工具。
-3. 点击 **应用程序 (Application)** 选项卡 -> 左侧 **Cookies** -> 找到 `https://www.twitch.tv`。
+3. 点击 **应用程序 (Application) / 存储** 选项卡 -> 左侧 **Cookies** -> 找到 `https://www.twitch.tv`。
 4. 在列表中找到名为 `auth-token` 的值，将其复制到 `.env` 文件中。
 
 ### 2. AI 功能增强 (可选)
