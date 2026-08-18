@@ -23,7 +23,7 @@ class BaseMetadataExtractor:
         """子類別必須實作這個方法"""
         raise NotImplementedError("請在子類別實作 analyze 方法")
 
-    def _match_and_format(self, platform: str, uploader: str, title: str, date_str: str, url: str) -> Dict:
+    def _match_and_format(self, platform: str, uploader: str, title: str, date_str: str, url: str, video_id: str = "UnknownID") -> Dict:
         """共用的 config.yaml 實況主匹配邏輯"""
         creator_name = "Unknown"
         uploader = uploader.lower()
@@ -50,7 +50,8 @@ class BaseMetadataExtractor:
             "creator": creator_name,
             "title": title,
             "date": date_str,
-            "original_url": url
+            "original_url": url,
+            "video_id": video_id
         }
 
 # ==========================================
@@ -93,6 +94,7 @@ class YtdlpExtractor(BaseMetadataExtractor):
             # 取出 Uploader 與標題
             uploader = raw_data.get("channel_id") or raw_data.get("uploader_id") or raw_data.get("uploader", "")
             title = raw_data.get("title", "No Title")
+            video_id = raw_data.get("id", "UnknownID")
             
             # 取出日期
             timestamp = raw_data.get("timestamp")
@@ -101,7 +103,7 @@ class YtdlpExtractor(BaseMetadataExtractor):
             else:
                 date_str = raw_data.get("upload_date", "19700101")
 
-            return self._match_and_format(platform, uploader, title, date_str, url)
+            return self._match_and_format(platform, uploader, title, date_str, url, video_id)
 
         except subprocess.CalledProcessError as e:
             print("yt-dlp 執行失敗。")
@@ -136,6 +138,11 @@ class TwitchExtractor(BaseMetadataExtractor):
         if self.oauth_token:
             # 注意官方文件的參數是 --oauth
             command.extend(["--oauth", self.oauth_token])
+
+        video_id = "UnknownID"
+        id_match = re.search(r"(?:videos/|video=)(\d+)", url)
+        if id_match:
+            video_id = id_match.group(1)
         
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8")
@@ -167,7 +174,7 @@ class TwitchExtractor(BaseMetadataExtractor):
                                 y, m, d = date_match.groups()
                                 date_str = f"{y}{int(m):02d}{int(d):02d}"
 
-            return self._match_and_format("twitch", uploader, title, date_str, url)
+            return self._match_and_format("twitch", uploader, title, date_str, url, video_id)
 
         except subprocess.CalledProcessError as e:
             print("TwitchDownloaderCLI 執行失敗 (可能網址錯誤或 OAuth Token 失效)。")

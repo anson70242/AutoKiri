@@ -19,6 +19,7 @@ class TwitterDownloader(BaseDownloader):
         
         # Twitter Space 是纯音频，这里强制提取并保存为 wav 格式
         output_path = self.generate_output_path(ext="wav")
+        # output_path = self.generate_output_path(ext="mp4")
         
         if output_path.exists():
             print(f"[Info] 音频文件已存在，跳过下载: {output_path.name}")
@@ -36,6 +37,23 @@ class TwitterDownloader(BaseDownloader):
             "-o", str(output_path),
             url
         ]
+
+        # base_command = [
+        #     str(ytdlp_exe),
+        #     "--rm-cache-dir",
+        #     "--ffmpeg-location", str(ffmpeg_exe),
+        #     "-f", "bestvideo[ext=mp4][vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        #     "--merge-output-format", "mp4",
+        #     # --- WAV 提取参数 ---
+        #     # "--extract-audio",       
+        #     # "--audio-format", "wav", 
+        #     # "--keep-video",
+        #     # ---
+        #     "--js-runtimes", "node",
+        #     "-N", "5",
+        #     "-o", str(output_path),
+        #     url
+        # ]
         
         # 1. 尝试无 Cookie 下载
         print("[Info] 尝试普通下载模式...")

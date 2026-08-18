@@ -30,6 +30,9 @@ class TwitcastDownloader(BaseDownloader):
             "--rm-cache-dir",
             "--js-runtimes", "node",                  
             "--ffmpeg-location", str(ffmpeg_exe),    
+            # --- 下面这两行是新增的修复代码 ---
+            "--downloader", "m3u8:ffmpeg",
+            # -----------------------------------
             "--hls-use-mpegts",
             "--write-comments", 
             "--merge-output-format", "mp4",

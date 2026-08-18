@@ -5,7 +5,6 @@ from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader,
 from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
 from src.highlight_cliper import WhisperTranscriber, SrtSplitter
 from src.downloader import TwitterDownloader
-from src.agents.translater import SrtTranslator
 import subprocess
 
 class DownloadPipeline:
@@ -18,7 +17,7 @@ class DownloadPipeline:
 
     def _update_ytdlp(self):
         print("\n" + "-" * 60)
-        print(">>> [下载管线 - 步骤 0] 检查并更新自带的 yt-dlp ...")
+        print(">>> [下载管线 - 步骤 0] 检查并更新自带的 yt-dlp (Nightly 通道)...")
         print("-" * 60)
         
         # 获取自带 yt-dlp 的绝对路径
@@ -31,7 +30,7 @@ class DownloadPipeline:
         try:
             # 执行更新命令
             result = subprocess.run(
-                [str(ytdlp_exe), "-U"], 
+                [str(ytdlp_exe), "--update-to", "nightly"],
                 capture_output=True, 
                 text=True, 
                 check=True
@@ -221,23 +220,9 @@ class HighlightPipeline:
             splitter.copy_prompts(Path(srt_path).parent, valid_prompts)
         #  =========================================================
 
-        #  =========== 新增：步骤 3 LLM 字幕翻译 (日→中) ===========
-        zh_srt_path = None
-        if srt_path and Path(srt_path).exists():
-            print("\n" + "-" * 60)
-            print(">>> [AI 管线 - 步骤 3] LLM 字幕翻译 (日→中) ...")
-            print("-" * 60)
-            try:
-                translator = SrtTranslator.from_config(self.config)
-                zh_srt_path = translator.translate(Path(srt_path))
-            except Exception as e:
-                print(f"[Warning] 字幕翻译失败，已跳过（不影响其他产物）: {e}")
-        #  =========================================================
-
         return {
             "srt_path": srt_path,
-            "split_srt_paths": split_files,
-            "zh_srt_path": zh_srt_path
+            "split_srt_paths": split_files
         }
 
 class TotalPipeline:

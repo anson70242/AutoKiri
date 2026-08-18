@@ -26,6 +26,17 @@ streamers:
       - platform: "youtube"
         channel_id: "UCGvqjigtg9uGXHwqT27wS9A"
 
+  - name: "Yuno"
+    accounts:
+      - platform: "youtube"
+        channel_id: "UC99kOG6_9RD0mR3OG4EOfxw"
+
+  - name: "Nonoka"
+    accounts:
+      - platform: "youtube"
+        channel_id: "UCGeCnpimiSN5rgiKbJzHd3A"
+  
+
 whisper:
   language: "ja"
   model: "large-v3-turbo"
