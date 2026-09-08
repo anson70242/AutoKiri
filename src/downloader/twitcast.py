@@ -30,9 +30,8 @@ class TwitcastDownloader(BaseDownloader):
             "--rm-cache-dir",
             "--js-runtimes", "node",                  
             "--ffmpeg-location", str(ffmpeg_exe),    
-            # --- 下面这两行是新增的修复代码 ---
+            # 原生 HLS 下载器在 TwitCasting 存档上会断流，改交给 ffmpeg 拉流
             "--downloader", "m3u8:ffmpeg",
-            # -----------------------------------
             "--hls-use-mpegts",
             "--write-comments", 
             "--merge-output-format", "mp4",

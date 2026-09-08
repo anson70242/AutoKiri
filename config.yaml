@@ -35,7 +35,6 @@ streamers:
     accounts:
       - platform: "youtube"
         channel_id: "UCGeCnpimiSN5rgiKbJzHd3A"
-  
 
 whisper:
   language: "ja"
@@ -53,18 +52,6 @@ prompts:
   # Gemini 相关提示词
   speech_analyze: "src/highlight_cliper/prompt/speech_analyze.md"
   to_excel: "src/highlight_cliper/prompt/to_excel.md"
-  # LLM 字幕翻译相关
-  translater: "src/agents/prompts/translater.md"
-  translater_glossary: "src/agents/prompts/vocab.md"
-
-agents:
-  # LLM 字幕翻译器配置
-  # 端点与密钥统一放在 .env：AUTOKIRI_LLM_BASE_URL / AUTOKIRI_LLM_API_KEY
-  # （如需覆盖模型也可在 .env 设 AUTOKIRI_LLM_MODEL）
-  - translater:
-      model: "unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL"
-      chunk_size: 50
-      overlap: 5
 
 tools_paths:
   # 注意：程序会自动在以下路径前加上 /tools/ 文件夹名

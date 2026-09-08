@@ -32,11 +32,6 @@ class YoutubeDownloader(BaseDownloader):
             "--ffmpeg-location", str(ffmpeg_exe),
             "-f", "bestvideo[ext=mp4][vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--merge-output-format", "mp4",
-            # --- WAV 提取参数 ---
-            # "--extract-audio",       
-            # "--audio-format", "wav", 
-            # "--keep-video",
-            # ---
             "--js-runtimes", "node",
             "-N", "5",
             "-o", str(output_path),

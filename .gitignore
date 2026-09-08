@@ -35,3 +35,7 @@ nul*
 # 其他
 *.exe
 build.bat
+
+# 打包发布产物
+*.rar
+*.7z

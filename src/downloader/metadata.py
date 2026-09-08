@@ -9,6 +9,8 @@ from datetime import datetime
 from typing import Dict, Optional, List, Tuple
 from dotenv import load_dotenv
 
+UNKNOWN_ID = "UnknownID"
+
 # ==========================================
 # 1. 定義抽象基底類別 (Base Extractor)
 # ==========================================
@@ -23,7 +25,7 @@ class BaseMetadataExtractor:
         """子類別必須實作這個方法"""
         raise NotImplementedError("請在子類別實作 analyze 方法")
 
-    def _match_and_format(self, platform: str, uploader: str, title: str, date_str: str, url: str, video_id: str = "UnknownID") -> Dict:
+    def _match_and_format(self, platform: str, uploader: str, title: str, date_str: str, url: str, video_id: str = "") -> Dict:
         """共用的 config.yaml 實況主匹配邏輯"""
         creator_name = "Unknown"
         uploader = uploader.lower()
@@ -51,7 +53,7 @@ class BaseMetadataExtractor:
             "title": title,
             "date": date_str,
             "original_url": url,
-            "video_id": video_id
+            "video_id": video_id or UNKNOWN_ID
         }
 
 # ==========================================
@@ -94,7 +96,7 @@ class YtdlpExtractor(BaseMetadataExtractor):
             # 取出 Uploader 與標題
             uploader = raw_data.get("channel_id") or raw_data.get("uploader_id") or raw_data.get("uploader", "")
             title = raw_data.get("title", "No Title")
-            video_id = raw_data.get("id", "UnknownID")
+            video_id = raw_data.get("id", "")
             
             # 取出日期
             timestamp = raw_data.get("timestamp")
@@ -124,6 +126,12 @@ class TwitchExtractor(BaseMetadataExtractor):
         self.exe_path = exe_path
         self.oauth_token = oauth_token
 
+    @staticmethod
+    def _video_id_from_url(url: str) -> str:
+        """從 Twitch VOD 網址取出數字 ID (CLI 的表格輸出裡沒有這欄)"""
+        match = re.search(r"(?:videos/|video=)(\d+)", url)
+        return match.group(1) if match else ""
+
     def analyze(self, url: str) -> Dict:
         if not self.exe_path.exists():
             print(f"找不到 TwitchDownloaderCLI: {self.exe_path}")
@@ -139,11 +147,6 @@ class TwitchExtractor(BaseMetadataExtractor):
             # 注意官方文件的參數是 --oauth
             command.extend(["--oauth", self.oauth_token])
 
-        video_id = "UnknownID"
-        id_match = re.search(r"(?:videos/|video=)(\d+)", url)
-        if id_match:
-            video_id = id_match.group(1)
-        
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8")
             # print(f"[Debug] Twitch CLI 原生输出:\n{result.stdout}")
@@ -174,7 +177,7 @@ class TwitchExtractor(BaseMetadataExtractor):
                                 y, m, d = date_match.groups()
                                 date_str = f"{y}{int(m):02d}{int(d):02d}"
 
-            return self._match_and_format("twitch", uploader, title, date_str, url, video_id)
+            return self._match_and_format("twitch", uploader, title, date_str, url, self._video_id_from_url(url))
 
         except subprocess.CalledProcessError as e:
             print("TwitchDownloaderCLI 執行失敗 (可能網址錯誤或 OAuth Token 失效)。")

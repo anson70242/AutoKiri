@@ -2,6 +2,7 @@
 from pathlib import Path
 from src.core import ConfigManager
 from src.downloader import MetadataManager, YoutubeDownloader, TwitchDownloader, TwitcastDownloader
+from src.downloader.metadata import UNKNOWN_ID
 from src.post_process import YoutubeChatParser, TwitchChatParser, VideoSplitter
 from src.highlight_cliper import WhisperTranscriber, SrtSplitter
 from src.downloader import TwitterDownloader
@@ -14,14 +15,20 @@ class DownloadPipeline:
         self.project_root = project_root
         self.config = ConfigManager(project_root)
         self.metadata_manager = MetadataManager(project_root)
+        self._ytdlp_checked = False
 
     def _update_ytdlp(self):
+        # process() 会被逐条影片调用，更新检查每个进程做一次就够了
+        if self._ytdlp_checked:
+            return
+        self._ytdlp_checked = True
+
         print("\n" + "-" * 60)
         print(">>> [下载管线 - 步骤 0] 检查并更新自带的 yt-dlp (Nightly 通道)...")
         print("-" * 60)
         
         # 获取自带 yt-dlp 的绝对路径
-        ytdlp_exe = self.config.get_tool_exe("yt-dlp", "yt-dlp/yt-dlp.exe") 
+        ytdlp_exe = self.config.get_tool_exe("yt_dlp", "yt-dlp/yt-dlp.exe") 
         
         if not ytdlp_exe or not Path(ytdlp_exe).exists():
             print(f"[Warning] 找不到自带的 yt-dlp 程序 ({ytdlp_exe})，请检查路径。将跳过更新。")
@@ -67,7 +74,7 @@ class DownloadPipeline:
 
         creator = metadata.get("creator", "Unknown")
         title = metadata.get("title", "UnknownTitle")
-        video_id = metadata.get("video_id", "UnknownID")
+        video_id = metadata.get("video_id", UNKNOWN_ID)
 
         # 拦截机制：如果是 Unknown，极大概率是 Cookie 失效被墙了
         if creator == "Unknown":
