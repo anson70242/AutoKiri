@@ -200,7 +200,9 @@ class HighlightPipeline:
         print("-" * 60)
         
         whisper_exe = self.config.get_tool_exe("faster_whisper", "faster-whisper-xxl/faster-whisper-xxl.exe")
-        transcriber = WhisperTranscriber(whisper_exe)
+        ffmpeg_exe = self.config.get_tool_exe("ffmpeg", "ffmpeg-8.0.1-essentials_build/bin/ffmpeg.exe")
+        ffprobe_exe = self.config.get_tool_exe("ffprobe", "ffmpeg-8.0.1-essentials_build/bin/ffprobe.exe")
+        transcriber = WhisperTranscriber(whisper_exe, ffmpeg_exe, ffprobe_exe)
         
         srt_path = transcriber.transcribe(
             video_path, 

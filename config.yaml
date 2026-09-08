@@ -46,6 +46,11 @@ whisper:
   no_speech_threshold: 0.5
   vad_threshold: 0.35
   vad_min_speech_duration_ms: 250
+  # 长直播分片转写：单片时长（分钟）。0 = 关闭分片，整档转写（旧行为，长片会爆内存）
+  # 实测峰值 ≈ 1.2GB 固定开销 + 2.4GB/小时，30 分钟一片约 2.5GB
+  chunk_minutes: 30
+  # 每片结尾多切的秒数，避免切口把一句话截断。合并时不去重，接缝处会有少量重复
+  overlap_seconds: 10
 
 prompts:
   # 路径相对于项目根目录
